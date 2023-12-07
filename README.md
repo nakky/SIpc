@@ -1,6 +1,6 @@
-# S3DMath
+# SIpc
 
-SIpc is a portable interprocess communication library, available for Unix-like OSx.
+SIpc is a portable interprocess communication library, available for Unix-like OS.
 
 ## How to build
 
