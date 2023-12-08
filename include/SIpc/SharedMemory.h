@@ -12,11 +12,21 @@ namespace SIpc
 	class SharedMemory
 	{
 	public:
-		SharedMemory(bool isMaster, const char *filepath, int projId, size_t size)
-			: mIsMaster(isMaster),
+		SharedMemory(const char *filepath, int projId, size_t size)
+			: mIsMaster(true),
 			  mFilePath(filepath),
 			  mProjectId(projId),
 			  mSize(size),
+			  mHead(NULL),
+			  mSegmentId(0)
+		{
+		}
+
+		SharedMemory(const char *filepath, int projId)
+			: mIsMaster(false),
+			  mFilePath(filepath),
+			  mProjectId(projId),
+			  mSize(0),
 			  mHead(NULL),
 			  mSegmentId(0)
 		{
@@ -30,10 +40,13 @@ namespace SIpc
 
 		bool isAttached() { return mHead != NULL; }
 
-		void *getHead() { return mHead; }
+		void *getDataHead() { return mDataHead; }
+
+		size_t getSize() { return mSize; }
 
 	protected:
 		void *mHead;
+		void *mDataHead;
 		std::string mFilePath;
 		int mProjectId;
 		size_t mSize;

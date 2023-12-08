@@ -27,13 +27,17 @@ namespace SIpc
 
             // std::cout << "Key:" << mKey << std::endl;
 
-            mSegmentId = shmget(mKey, mSize, 0644 | IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
+            size_t size = mSize + sizeof(int);
+
+            mSegmentId = shmget(mKey, size, 0644 | IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
             if (mSegmentId == -1)
             {
                 std::cerr << "Failed to acquire segment" << std::endl;
                 return;
             }
             mHead = shmat(mSegmentId, 0, 0);
+            mDataHead = (char *)mHead + sizeof(int);
+            memcpy(mHead, &mSize, sizeof(int));
         }
         else
         {
@@ -53,6 +57,8 @@ namespace SIpc
                 return;
             }
             mHead = shmat(mSegmentId, 0, 0);
+            mDataHead = (char *)mHead + sizeof(int);
+            memcpy(&mSize, mHead, sizeof(int));
         }
     }
 
@@ -62,20 +68,24 @@ namespace SIpc
         {
             shmdt(mHead);
             mHead = NULL;
+            mDataHead = NULL;
             shmctl(mSegmentId, IPC_RMID, NULL);
         }
         else
         {
             shmdt(mHead);
             mHead = NULL;
+            mDataHead = NULL;
         }
+
+        std::filesystem::remove(mFilePath.c_str());
     }
 
     bool SharedMemory::write(int offset, size_t size, const void *buf)
     {
         if (!isAttached())
             return false;
-        memcpy((char *)mHead + offset, buf, size);
+        memcpy((char *)mDataHead + offset, buf, size);
         return true;
     }
 
@@ -83,7 +93,7 @@ namespace SIpc
     {
         if (!isAttached())
             return false;
-        memcpy(buf, (char *)mHead + offset, size);
+        memcpy(buf, (char *)mDataHead + offset, size);
         return true;
     }
 

@@ -10,7 +10,7 @@ using namespace SIpc;
 
 int main(void)
 {
-    SharedMemory *master = new SharedMemory(true, "./test", 100, 10);
+    SharedMemory *master = new SharedMemory("./test", 100, 10);
     master->initialize();
 
     master->write(0, 7, "Hello!\0");
