@@ -66,17 +66,19 @@ namespace SIpc
     {
         if (mIsMaster)
         {
-            shmdt(mHead);
-            mHead = NULL;
-            mDataHead = NULL;
-            shmctl(mSegmentId, IPC_RMID, NULL);
+            if (isAttached())
+            {
+                shmdt(mHead);
+                shmctl(mSegmentId, IPC_RMID, NULL);
+            }
         }
         else
         {
-            shmdt(mHead);
-            mHead = NULL;
-            mDataHead = NULL;
+            if (isAttached())
+                shmdt(mHead);
         }
+        mHead = NULL;
+        mDataHead = NULL;
 
         std::filesystem::remove(mFilePath.c_str());
     }
