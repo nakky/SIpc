@@ -2,6 +2,7 @@ sipc_inc = include_directories('../include')
 
 sipc_srcs = [
   'SharedMemory.cpp',
+  'Process.cpp',
 ]
 
 
