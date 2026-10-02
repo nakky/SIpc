@@ -71,6 +71,9 @@ namespace SIpc
                 shmdt(mHead);
                 shmctl(mSegmentId, IPC_RMID, NULL);
             }
+            // The key file belongs to the master; other processes still
+            // need it to find the segment.
+            std::filesystem::remove(mFilePath.c_str());
         }
         else
         {
@@ -79,8 +82,6 @@ namespace SIpc
         }
         mHead = NULL;
         mDataHead = NULL;
-
-        std::filesystem::remove(mFilePath.c_str());
     }
 
     bool SharedMemory::write(int offset, size_t size, const void *buf)
